@@ -1,0 +1,5 @@
+const ts = Date.now().toString()
+console.log(ts)
+const date = new Date(Number(ts))
+console.log(date)
+console.log(new Date())
