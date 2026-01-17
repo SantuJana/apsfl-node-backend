@@ -27,6 +27,10 @@ async function produceEvent(host, event) {
             event.servertype,
             "ts",
             event.ts,
+            "servername",
+            event.servername,
+            "primaryip",
+            event.primaryip
         )
     } catch (error) {
         console.log(`${host}: `, 'Failed to push event on redis')

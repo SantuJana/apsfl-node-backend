@@ -3,7 +3,7 @@ const { pool } = require(".")
 async function insertBatch(values, params) {
     try {
         const sql = `
-            INSERT INTO events (host, eventid, alerttype, alertname, channelid, channelname, eventlocation, eventtime, serverid, servertype, ts)
+            INSERT INTO events (host, eventid, alerttype, alertname, channelid, channelname, eventlocation, eventtime, serverid, servertype, ts, servername, primaryip)
             VALUES ${values.join(',')};
         `
         
@@ -88,12 +88,12 @@ async function getCameraWiseCount(sourceId, dateEpoch) {
     const sql1 = `SELECT host FROM sources WHERE id = $1`
 
     const sql2 = `
-        SELECT channelid, (array_agg(channelname ORDER BY ts DESC))[1] AS channelname, count(1) AS event_count 
+        SELECT channelid, serverid, (array_agg(servername ORDER BY ts DESC))[1] AS servername, servertype, (array_agg(channelname ORDER BY ts DESC))[1] AS channelname, count(1) AS event_count 
         FROM events
         WHERE host =  $1
         AND (EXTRACT(EPOCH FROM ts) * 1000)::bigint >= $2::bigint
         AND (EXTRACT(EPOCH FROM ts) * 1000)::bigint < $3::bigint
-        GROUP BY channelid
+        GROUP BY channelid, serverid, servertype
         ORDER BY channelid
     `
     const source = await pool.query(sql1, [sourceId])

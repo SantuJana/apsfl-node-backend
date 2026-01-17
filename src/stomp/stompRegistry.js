@@ -53,6 +53,8 @@ function startStomp(config) {
                             serverid: msg.serverid ,
                             servertype: msg.servertype ,
                             ts: Date.now().toString() ,
+                            servername: msg.server?.servername || '' ,
+                            primaryip: msg.server?.primaryip || '' ,
                         })
                     }
                 })
@@ -75,6 +77,8 @@ function startStomp(config) {
                             serverid: msg.serverid ,
                             servertype: msg.servertype ,
                             ts: Date.now().toString() ,
+                            servername: msg.server?.servername || '' ,
+                            primaryip: msg.server?.primaryip || '' ,
                         })
                     }
                 })

@@ -25,6 +25,8 @@ function startWs(config, type) {
                     serverid: msg.serverid ,
                     servertype: msg.servertype ,
                     ts: Date.now().toString() ,
+                    servername: msg.server?.servername || '' ,
+                    primaryip: msg.server?.primaryip || '' ,
                 })
             }
         }
