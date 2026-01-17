@@ -100,21 +100,27 @@ async function updateSource(id, payload) {
     stopWs(`${id}-ivms`)
     stopStomp(id)
 
-    setTimeout(() => {
-        if (payload.broker === 'ws') {
-            if (payload.itms) {
-                startWs({id, ...payload}, 'itms')
-            }
-        
-            if (payload.ivms) {
-                startWs({id, ...payload}, 'ivms')
-            }
-        }
+    const sql1 = `SELECT * FROM sources WHERE id = $1`
+    const result = await pool.query(sql1, [id])
+    const record = result.rows?.[0]
 
-        if (payload.broker === 'stomp') {
-            startStomp({id, ...payload})
-        }
-    }, 1000)
+    if (record.enabled) {
+        setTimeout(() => {
+            if (payload.broker === 'ws') {
+                if (payload.itms) {
+                    startWs({id, ...payload}, 'itms')
+                }
+            
+                if (payload.ivms) {
+                    startWs({id, ...payload}, 'ivms')
+                }
+            }
+    
+            if (payload.broker === 'stomp') {
+                startStomp({id, ...payload})
+            }
+        }, 1000)
+    }
 
     return {id, ...payload}
 }
