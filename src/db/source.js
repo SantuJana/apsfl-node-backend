@@ -66,15 +66,56 @@ async function removeSource(id) {
 
 async function updateSourceStatus(id) {
     const sql = `UPDATE sources SET enabled = NOT enabled WHERE id = $1;`
+    const sqlSelect = `SELECT * FROM sources WHERE id = $1;`
 
-    const result = await pool.query(sql, [id])
-    return result.rows
+    await pool.query(sql, [id])
+    const result = await pool.query(sqlSelect, [id])
+    const data = result.rows[0]
+
+    if (data.enabled) {
+        if (data.broker === 'ws') {
+            if (data.itms) {
+                startWs(data, 'itms')
+            }
+        
+            if (data.ivms) {
+                startWs(data, 'ivms')
+            }
+        } else if (data.broker === 'stomp') {
+            startStomp(data)
+        }
+    } else {
+        stopWs(`${data.id}-itms`)
+        stopWs(`${data.id}-ivms`)
+        stopStomp(data.id)
+    }
 }
 
 async function updateSource(id, payload) {
-    const sql = `UPDATE sources SET name = $2, host = $3, port = $4, protocol = $5, enabled = $6, itms = $7, ivms = $8 WHERE id = $1;`
+    const sql = `UPDATE sources SET name = $2, host = $3, port = $4, protocol = $5, itms = $6, ivms = $7, broker = $8 WHERE id = $1;`
 
-    await pool.query(sql, [id, payload.name, payload.host, payload.port, payload.protocol, payload.enabled, payload.itms, payload.ivms])
+    await pool.query(sql, [id, payload.name, payload.host, payload.port, payload.protocol, payload.itms, payload.ivms, payload.broker])
+
+    stopWs(`${id}-itms`)
+    stopWs(`${id}-ivms`)
+    stopStomp(id)
+
+    setTimeout(() => {
+        if (payload.broker === 'ws') {
+            if (payload.itms) {
+                startWs({id, ...payload}, 'itms')
+            }
+        
+            if (payload.ivms) {
+                startWs({id, ...payload}, 'ivms')
+            }
+        }
+
+        if (payload.broker === 'stomp') {
+            startStomp({id, ...payload})
+        }
+    }, 1000)
+
     return {id, ...payload}
 }
 

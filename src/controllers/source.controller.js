@@ -50,10 +50,16 @@ async function toggleSourceEnable(req, res) {
 
 async function modifySource(req, res) {
     const id = req.params.id
-    const { name, host, port, protocol, enabled, itms, ivms } = req.body
+    const { name, host, port, protocol, itms, ivms, broker } = req.body
 
-    if (!name || !host || !port || !protocol || enabled == undefined || itms === undefined || ivms === undefined) {
+    if (!name || !host || !port || !protocol || !broker || itms === undefined || ivms === undefined) {
         return res.status(400).json({ success: false, error: 'All fields are required.' })
+    }
+
+    if (!TEST_MODE) {
+        const exists = await getSourceByHost(host)
+    
+        if (!!exists.length) return res.status(400).json({ success: false, error: 'Host already added.' })
     }
 
     const result = await updateSource(id, req.body)
