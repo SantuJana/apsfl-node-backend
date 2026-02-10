@@ -102,8 +102,8 @@ async function processBatch(
 
     for (const [id, fields] of messages) {
         ids.push(id)
-        values.push(`($${index * 13 + 1}, $${index * 13 + 2}, $${index * 13 + 3}, $${index * 13 + 4}, $${index * 13 + 5}, $${index * 13 + 6}, $${index * 13 + 7}, $${index * 13 + 8}, $${index * 13 + 9}, $${index * 13 + 10}, $${index * 13 + 11}, $${index * 13 + 12}, $${index * 13 + 13})`)
-        params.push(fields[1], Number(fields[3]), Number(fields[5]), fields[7], Number(fields[9]), fields[11], fields[13], fields[15], Number(fields[17]), fields[19], new Date(Number(fields[21])), fields[23], fields[25])
+        values.push(`($${index * 14 + 1}, $${index * 14 + 2}, $${index * 14 + 3}, $${index * 14 + 4}, $${index * 14 + 5}, $${index * 14 + 6}, $${index * 14 + 7}, $${index * 14 + 8}, $${index * 14 + 9}, $${index * 14 + 10}, $${index * 14 + 11}, $${index * 14 + 12}, $${index * 14 + 13}, $${index * 14 + 14})`)
+        params.push(fields[1], Number(fields[3]), Number(fields[5]), fields[7], Number(fields[9]), fields[11], fields[13], fields[15], Number(fields[17]), fields[19], new Date(Number(fields[21])), fields[23], fields[25], fields[27])
         index++
     }
 

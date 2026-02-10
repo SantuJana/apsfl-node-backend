@@ -27,6 +27,20 @@ function startStomp(config) {
         heartbeatOutgoing: 10000,
         reconnectDelay: 5000,
 
+        debug: (msg) => {
+            if (msg.includes('PONG'))console.log(msg)
+            if (msg.includes('Received data') || msg.includes('<<< MESSAGE')) return
+            console.log(config.host, msg)
+            
+            if (msg.includes('>>> SUBSCRIBE') || msg.includes('/event/itms')) {
+                console.log(`${config.host}: `, '✅ ITMS subscribed')
+                addLog({ host: config.host, message: `${config.host}(stomp-itms): Subscribed to Stomp itms.` })
+            } else if (msg.includes('>>> SUBSCRIBE') || msg.includes('/event/ivms')) {
+                console.log(`${config.host}: `, '✅ IVMS subscribed')
+                addLog({ host: config.host, message: `${config.host}(stomp-ivms): Subscribed to Stomp ivms.` })
+            }
+        },
+
         webSocketFactory: () =>
             new WebSocket(WS_URL, {
                 rejectUnauthorized: false, // self-signed cert
@@ -37,8 +51,6 @@ function startStomp(config) {
             addLog({ host: config.host, message: `${config.host}(stomp): Connected to Stomp Server.` })
 
             if (config.ivms) {
-                console.log(`${config.host}: `, '✅ IVMS subscribed')
-                addLog({ host: config.host, message: `${config.host}(stomp-ivms): Subscribed to Stomp ivms.` })
                 client.subscribe('/event/ivms', (message) => {
                     const eventObj = JSON.parse(message.body || '');
                     for (const msg of eventObj?.result || []) {
@@ -55,14 +67,13 @@ function startStomp(config) {
                             ts: Date.now().toString() ,
                             servername: msg.server?.servername || '' ,
                             primaryip: msg.server?.primaryip || '' ,
+                            sourceId: config.id
                         })
                     }
                 })
             }
 
             if (config.itms) {
-                console.log(`${config.host}: `, '✅ ITMS subscribed')
-                addLog({ host: config.host, message: `${config.host}(stomp-itms): Subscribed to Stomp itms.` })
                 client.subscribe('/event/itms', (message) => {
                     const eventObj = JSON.parse(message.body || '');
                     for (const msg of eventObj?.result || []) {
@@ -79,6 +90,7 @@ function startStomp(config) {
                             ts: Date.now().toString() ,
                             servername: msg.server?.servername || '' ,
                             primaryip: msg.server?.primaryip || '' ,
+                            sourceId: config.id
                         })
                     }
                 })

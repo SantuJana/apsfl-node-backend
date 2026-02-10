@@ -1,10 +1,10 @@
 const { getHourlyEventCount, getSpecificHourEventCount, getCameraWiseCount } = require("../db/event")
 
 async function getEventCounts(req, res) {
-    const { host, dateEpoch, type } = req.params
+    const { sourceId, dateEpoch, type } = req.params
 
     try {
-        const counts = await getHourlyEventCount(dateEpoch, host, type)
+        const counts = await getHourlyEventCount(dateEpoch, sourceId, type)
         res.json(counts)
     } catch (error) {
         console.log(error.message)
@@ -13,10 +13,10 @@ async function getEventCounts(req, res) {
 }
 
 async function getHourEventCount(req, res) {
-    const { host, hourStartEpoch, type } = req.params
+    const { sourceId, hourStartEpoch, type } = req.params
 
     try {
-        const counts = await getSpecificHourEventCount(host, hourStartEpoch, type)
+        const counts = await getSpecificHourEventCount(sourceId, hourStartEpoch, type)
         res.json(counts[0])
     } catch (error) {
         console.log(error.message)
